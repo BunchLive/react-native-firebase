@@ -28,7 +28,7 @@ export default class PhoneAuthListener {
     this._promise = null;
     this._jsStack = new Error().stack;
 
-    this._timeout = timeout || 20;
+    this._timeout = typeof timeout === 'number' && 0 <= timeout ? timeout : 20;
     this._phoneAuthRequestId = REQUEST_ID++;
     this._forceResending = forceResend || false;
 
