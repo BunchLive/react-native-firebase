@@ -65,8 +65,10 @@ NSString *const DATABASE_PERSISTENCE_CACHE_SIZE = @"firebase_database_persistenc
   @try {
     // Persistence enabled
     BOOL *persistenceEnabled = (BOOL *) [preferences getBooleanValue:DATABASE_PERSISTENCE_ENABLED defaultValue:false];
-    [firDatabase setPersistenceEnabled:(BOOL) persistenceEnabled];
-
+    if (firDatabase.persistenceEnabled != (BOOL)persistenceEnabled){
+      [firDatabase setPersistenceEnabled:(BOOL) persistenceEnabled];
+    }
+    
     // Logging enabled
     BOOL *loggingEnabled = (BOOL *) [preferences getBooleanValue:DATABASE_LOGGING_ENABLED defaultValue:false];
     [FIRDatabase setLoggingEnabled:(BOOL) loggingEnabled];
