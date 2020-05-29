@@ -55,7 +55,8 @@ public class ReactNativeFirebaseMessagingModule extends ReactNativeFirebaseModul
       initialNotification = null;
       return;
     } else {
-      Intent intent = getCurrentActivity().getIntent();
+      Activity activity = getCurrentActivity();
+      Intent intent = activity != null ? activity.getIntent() : null;
 
       if (intent != null && intent.getExtras() != null) {
         // messageId can be either one...
