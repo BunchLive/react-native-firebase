@@ -20,6 +20,7 @@ package io.invertase.firebase.auth;
 import android.app.Activity;
 import android.net.Uri;
 import android.os.Parcel;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
@@ -939,6 +940,18 @@ class ReactNativeFirebaseAuthModule extends ReactNativeFirebaseModule {
     final String verificationCode,
     final Promise promise
   ) {
+    if (TextUtils.isEmpty(mVerificationId) || TextUtils.isEmpty(verificationCode)) {
+      Exception exception = new IllegalArgumentException(
+        "Cannot create PhoneAuthCredential. Both verificationId and verificationCode cannot be empty.");
+      Log.e(
+        TAG,
+        "confirmationResultConfirm:precondition",
+        exception
+      );
+      promiseRejectAuthException(promise, exception);
+      return;
+    }
+
     FirebaseApp firebaseApp = FirebaseApp.getInstance(appName);
     FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(firebaseApp);
 
@@ -1382,8 +1395,10 @@ class ReactNativeFirebaseAuthModule extends ReactNativeFirebaseModule {
       return credential;
     }
 
-    if (authToken != null) {
+    if (!TextUtils.isEmpty(authToken) && !TextUtils.isEmpty(authSecret)) {
       return PhoneAuthProvider.getCredential(authToken, authSecret);
+    } else {
+      Log.w(TAG, "getPhoneAuthCredential: Failed to create PhoneAuthProvider credentials. Both authToken and authSecret cannot be empty.");
     }
 
     return null;
