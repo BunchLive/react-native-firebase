@@ -106,7 +106,16 @@
     if (error) NSLog(@"RNFBDynamicLinks: Unknown error occurred when attempting to handle a universal link: %@", error);
   };
 
-  [[FIRDynamicLinks dynamicLinks] handleUniversalLink:userActivity.webpageURL completion:completion];
+  BOOL handled = [[FIRDynamicLinks dynamicLinks] handleUniversalLink:userActivity.webpageURL completion:completion];
+  if (!handled) {
+    NSString *linkUrl = userActivity.webpageURL.absoluteString;
+    if ([linkUrl containsString:@"bunch.party?link="]) {
+      [[RNFBRCTEventEmitter shared] sendEventWithName:LINK_RECEIVED_EVENT body:@{
+          @"url": linkUrl,
+          @"minimumAppVersion": [NSNull null],
+      }];
+    }
+  }
 
   // results of this are ORed and NO doesn't affect other delegate interceptors' result
   return NO;
