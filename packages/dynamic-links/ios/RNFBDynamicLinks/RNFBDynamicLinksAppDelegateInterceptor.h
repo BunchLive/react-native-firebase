@@ -22,14 +22,51 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol RNFBDynamicLinksAppDelegateInterceptorDelegate;
+
 static NSString *const LINK_RECEIVED_EVENT = @"dynamic_links_link_received";
 
 @interface RNFBDynamicLinksAppDelegateInterceptor : NSObject <UIApplicationDelegate>
 @property (strong, readwrite) NSString *_Nullable initialLinkUrl;
 @property (strong, readwrite) NSString *_Nullable initialLinkMinimumAppVersion;
+@property (weak, nonatomic) id<RNFBDynamicLinksAppDelegateInterceptorDelegate> _Nullable delegate;
 
 + (instancetype)sharedInstance;
 
+@end
+
+@protocol RNFBDynamicLinksAppDelegateInterceptorDelegate<NSObject>
+@optional
+
+// willOpenURL -> shouldOpenURL? -(Y)-> didOpenURL
+//                               -(N)-> X
+- (NSURL *)dynamicLinksAppDelegateInterceptor:(RNFBDynamicLinksAppDelegateInterceptor *)interceptor
+                                  willOpenURL:(NSURL *)url
+                            sourceApplication:(NSString *)sourceApplication
+                                   annotation:(id)annotation;
+
+- (BOOL)dynamicLinksAppDelegateInterceptor:(RNFBDynamicLinksAppDelegateInterceptor *)interceptor
+                             shouldOpenURL:(NSURL *)url
+                         sourceApplication:(NSString *)sourceApplication
+                                annotation:(id)annotation;
+
+- (void)dynamicLinksAppDelegateInterceptor:(RNFBDynamicLinksAppDelegateInterceptor *)interceptor
+                                didOpenURL:(NSURL *)url
+                         sourceApplication:(NSString *)sourceApplication
+                                annotation:(id)annotation
+                               dynamicLink:(FIRDynamicLink * _Nullable)dynamicLink;
+
+// willContinueUserActivity -> shouldContinueUserActivity? -(Y)-> didContinueUserActivity
+//                                                         -(N)-> X
+- (NSUserActivity *)dynamicLinksAppDelegateInterceptor:(RNFBDynamicLinksAppDelegateInterceptor *)interceptor
+                              willContinueUserActivity:(NSUserActivity *)userActivity;
+
+- (BOOL)dynamicLinksAppDelegateInterceptor:(RNFBDynamicLinksAppDelegateInterceptor *)interceptor
+                shouldContinueUserActivity:(NSUserActivity *)userActivity;
+
+- (void)dynamicLinksAppDelegateInterceptor:(RNFBDynamicLinksAppDelegateInterceptor *)interceptor
+                   didContinueUserActivity:(NSUserActivity *)userActivity
+                                   handled:(BOOL)handled;
 
 @end
 
